@@ -1,20 +1,22 @@
+# Funny numbers to test out with this
+# 27, 9663
+
+
 import time
 from colorama import Fore, Style
 import matplotlib.pyplot as plt
 import json
 
-delay = 0
+delay = 0.25 # Delay between each calculation
 
+# Graph Settings
 plt.xlabel("Calculations")
 plt.ylabel("Height")
 plt.title("Collatz Conjecture")
 
+x, y = [], []
 
 def main():
-    global x, y
-    x = []
-    y = []
-
     while True:
         print(Fore.BLUE + "1. View Iterations")
         print(Fore.GREEN + "2. Create Iteration")
@@ -22,45 +24,29 @@ def main():
         print(Fore.YELLOW + "4. Exit")
         print(Style.RESET_ALL)
 
-        choice = int(input("> "))
-
-        if choice == 1:
-            view_iteration()
-        elif choice == 2:
-            create_iteration()
-        elif choice == 3:
-            delete_iteration()
-        elif choice == 4:
-            break
+        action = {1: view_iteration, 2: create_iteration, 3: delete_iteration}.get(int(input("> ")), None)
+        if action is None:break
+        else:action()
 
 def add_iteration():
     try:
         with open("iterations.json", 'r+') as file:
-            try:
-                iterations = json.load(file)
-            except json.decoder.JSONDecodeError:
-                iterations = []
+            try: iterations = json.load(file)
+            except json.decoder.JSONDecodeError: iterations = []
     except FileNotFoundError:
-        with open("iterations.json", 'w') as file:
-            iterations = []
+        with open("iterations.json", 'w') as file: iterations = []
 
     with open("iterations.json", 'r+') as file:
-        try:
-            iterations = json.load(file)
-        except json.decoder.JSONDecodeError:
-                iterations = []
+        try: iterations = json.load(file)
+        except json.decoder.JSONDecodeError: iterations = []
         
-        # Determine the iteration number
         iteration_number = len(iterations) + 1
         iteration_name = f"iteration{iteration_number}"
         
-        # Create a new dictionary for the iteration
         new_iteration = {iteration_name: [x,y]}
         
-        # Append the new iteration to the list
         iterations.append(new_iteration)
         
-        # Write the updated data back to the file
         file.seek(0)
         json.dump(iterations, file, indent=4)
         file.truncate()
@@ -71,12 +57,15 @@ def create_iteration():
 
     print(Fore.BLUE + f"{start}")
     while start != 1:
+        if start == 0: break
         if start % 2 == 0:
             start = start / 2
             print(Fore.GREEN + f"{start}")
+
         else:
             start = start * 3 + 1
             print(Fore.RED + f"{start}")
+
         calculations += 1
         x.append(calculations)
         y.append(start)
@@ -85,11 +74,10 @@ def create_iteration():
     print(Fore.BLUE + f"Calculations: {calculations}")
     print(Style.RESET_ALL)
     add_iteration()
-    x.clear()
-    y.clear()
+    x.clear() 
+    y.clear() 
 
 def view_iteration():
-    # print out a list of iterations from the json
     try:
         with open("iterations.json", 'r') as f:
             iterations = json.load(f)
@@ -111,8 +99,7 @@ def view_iteration():
     
 
 def delete_iteration():
-    with open("iterations.json", 'w') as f:
-        f.write("")
+    with open("iterations.json", 'w') as f: f.write("")
     print("All iterations deleted")
 
     
